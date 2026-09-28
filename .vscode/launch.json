@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Pengingat Tugas",
+      "cwd": "pengingat_tugas",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "Pengingat Tugas (Release)",
+      "cwd": "pengingat_tugas",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "dart.projectSearchDepth": 2,
+  "dart.flutterSdkPath": "C:\\Users\\Lenovo\\.puro\\envs\\stable\\flutter",
+  "java.import.gradle.enabled": false,
+  "gradle.nestedProjects": true,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    ".gradle": true
+  }
+}

@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pengingat Tugas - Aplikasi Manajemen Tugas & Alarm Pintar</title>
+  <meta name="description" content="Aplikasi pengingat tugas dan deadline dengan alarm cerdas, nada dering MP3 kustom, login biometrik, dan kalender terintegrasi. Download APK gratis." />
+  <meta name="theme-color" content="#4f46e5" />
+
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Pengingat Tugas - Aplikasi Manajemen Tugas & Alarm Pintar" />
+  <meta property="og:description" content="Atur aktivitas, deadline tugas, dan alarm tepat waktu dengan mudah. 100% Offline, Aman & Cepat." />
+  <meta property="og:image" content="assets/screenshot_home.png" />
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          },
+          animation: {
+            'float-slow': 'float 6s ease-in-out infinite',
+            'float-fast': 'float 4.5s ease-in-out infinite reverse',
+            'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
+            'equalizer': 'equalizer 0.8s ease-in-out infinite alternate',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-12px)' },
+            },
+            pulseGlow: {
+              '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+              '50%': { opacity: '0.8', transform: 'scale(1.04)' },
+            },
+            equalizer: {
+              '0%': { height: '4px' },
+              '100%': { height: '18px' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    .glass-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+    .dark .glass-card {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .gradient-mesh {
+      background-image: 
+        radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.22) 0px, transparent 50%),
+        radial-gradient(at 90% 10%, rgba(168, 85, 247, 0.2) 0px, transparent 50%),
+        radial-gradient(at 50% 80%, rgba(59, 130, 246, 0.18) 0px, transparent 50%);
+    }
+    .phone-mockup-frame {
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), 0 0 0 10px #1e293b;
+      transform-style: preserve-3d;
+      transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .dark .phone-mockup-frame {
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 10px #0f172a;
+    }
+    .tab-active {
+      background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
+      color: white !important;
+      box-shadow: 0 8px 20px -4px rgba(79, 70, 229, 0.4);
+    }
+    .cursor-glow {
+      pointer-events: none;
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(168, 85, 247, 0.08) 50%, transparent 70%);
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s ease;
+      z-index: 1;
+    }
+    .wave-bar {
+      width: 3px;
+      border-radius: 2px;
+      background: currentColor;
+    }
+    .wave-bar:nth-child(1) { animation: equalizer 0.6s ease-in-out infinite alternate 0.1s; }
+    .wave-bar:nth-child(2) { animation: equalizer 0.8s ease-in-out infinite alternate 0.3s; }
+    .wave-bar:nth-child(3) { animation: equalizer 0.5s ease-in-out infinite alternate 0.2s; }
+    .wave-bar:nth-child(4) { animation: equalizer 0.7s ease-in-out infinite alternate 0.4s; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen font-sans antialiased selection:bg-brand-500 selection:text-white relative">
+
+  <!-- Floating Glow Decor -->
+  <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-brand-500/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+  <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+  <!-- Navbar -->
+  <header class="fixed top-0 left-0 right-0 z-50 glass-card transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Logo -->
+        <a href="#" class="flex items-center gap-3.5 group">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-brand-500/30 group-hover:scale-105 transition-transform p-2">
+            <img src="assets/icon.png" alt="Logo" class="w-full h-full object-contain rounded-xl" />
+          </div>
+          <div>
+            <span class="font-bold text-xl tracking-tight bg-gradient-to-r from-brand-600 to-indigo-600 bg-clip-text text-transparent dark:from-brand-400 dark:to-indigo-300">Pengingat Tugas</span>
+            <span class="block text-[10px] uppercase tracking-wider font-semibold text-slate-400">Mobile Edition v1.0.0</span>
+          </div>
+        </a>
+
+        <!-- Desktop Menu -->
+        <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600 dark:text-slate-300">
+          <a href="#sinopsis" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Sinopsis</a>
+          <a href="#fitur" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Fitur Unggulan</a>
+          <a href="#preview" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Galeri Tampilan</a>
+          <a href="#perbandingan" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Keunggulan</a>
+          <a href="#panduan" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Cara Pasang</a>
+        </nav>
+
+        <!-- Action & Dark Mode Toggle -->
+        <div class="flex items-center gap-3">
+          <button id="theme-toggle" class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors" aria-label="Toggle Theme">
+            <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
+            <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
+          </button>
+          <a href="#download" class="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white font-semibold text-sm shadow-md shadow-brand-500/25 hover:shadow-lg hover:shadow-brand-500/40 hover:-translate-y-0.5 transition-all">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>Unduh APK</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section with Interactive Parallax & Dynamic Animations -->
+  <section id="hero-section" class="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden gradient-mesh">
+    <!-- Ambient Cursor Glow follower -->
+    <div id="cursor-glow" class="cursor-glow hidden lg:block opacity-0"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        
+        <!-- Hero Text -->
+        <div class="lg:col-span-7 text-center lg:text-left space-y-6">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-50 dark:bg-brand-950/80 border border-brand-200 dark:border-brand-800/80 text-brand-700 dark:text-brand-300 text-xs font-semibold tracking-wide">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            Aplikasi Produktivitas & Alarm Pintar • 100% Offline
+          </div>
+
+          <!-- Dynamic Headline with Animated Rotating Text -->
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.15] min-h-[120px] sm:min-h-[140px] lg:min-h-[150px]">
+            Kelola <span id="rotating-text" class="bg-gradient-to-r from-brand-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent transition-opacity duration-300">Tugas & Deadline</span><br class="hidden sm:inline" />
+            dengan <span class="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Presisi Tanpa Batas</span>.
+          </h1>
+
+          <p class="text-lg sm:text-xl text-slate-600 dark:text-slate-300 font-normal leading-relaxed max-w-2xl mx-auto lg:mx-0">
+            Aplikasi pengingat tugas harian dengan <strong>Smart Alarm Engine (8-Layer Fallback)</strong>, kustomisasi nada MP3 favorit, proteksi login sidik jari, dan tampilan kalender visual yang dirancang untuk produktivitas optimal.
+          </p>
+
+          <!-- Action Download & Interactive Test Buttons -->
+          <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-3">
+            <a href="pengingat-tugas.apk" download="pengingat-tugas.apk" id="download" class="w-full sm:w-auto inline-flex items-center justify-center gap-3.5 px-8 py-4 rounded-2xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white font-bold text-base shadow-xl shadow-brand-600/30 hover:shadow-2xl hover:shadow-brand-600/50 hover:-translate-y-1 transition-all group">
+              <i data-lucide="download" class="w-5 h-5 group-hover:animate-bounce"></i>
+              <div class="text-left">
+                <span class="block text-[11px] uppercase tracking-wider text-brand-200 font-semibold leading-none">Download Langsung</span>
+                <span class="text-base font-bold">Unduh APK (v1.0.0)</span>
+              </div>
+            </a>
+            
+            <button onclick="triggerHeroAlarmSound()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold text-base border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow hover:scale-105 transition-all group">
+              <i data-lucide="volume-2" class="w-5 h-5 text-amber-500 group-hover:scale-110 transition-transform"></i>
+              <span id="hero-sound-btn-text">Tes Bunyi Alarm</span>
+            </button>
+          </div>
+
+          <!-- Quick Interactive Checklist Card in Hero -->
+          <div class="p-4 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 max-w-lg mx-auto lg:mx-0 shadow-sm backdrop-blur-md">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-brand-500"></i> Coba Interaktif: Selesaikan Tugas Hari Ini
+            </p>
+            <div class="space-y-2">
+              <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-brand-50/50 dark:hover:bg-brand-950/40 cursor-pointer transition-colors select-none">
+                <input type="checkbox" checked onchange="toggleHeroCheck(this)" class="w-5 h-5 rounded-md text-brand-600 focus:ring-brand-500 cursor-pointer accent-brand-600" />
+                <span class="text-xs sm:text-sm line-through text-slate-400 font-medium">Presentasi Proyek Tugas Akhir (08:30)</span>
+                <span class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 font-bold">Selesai</span>
+              </label>
+              <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-brand-50/50 dark:hover:bg-brand-950/40 cursor-pointer transition-colors select-none">
+                <input type="checkbox" onchange="toggleHeroCheck(this)" class="w-5 h-5 rounded-md text-brand-600 focus:ring-brand-500 cursor-pointer accent-brand-600" />
+                <span class="text-xs sm:text-sm text-slate-700 dark:text-slate-200 font-medium">Review Laporan & Update Sistem (13:00)</span>
+                <span class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 font-bold">Prioritas Tinggi</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Quick Specs & Trust Badges -->
+          <div class="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-y-2.5 gap-x-6 text-xs font-medium text-slate-500 dark:text-slate-400">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="smartphone" class="w-4 h-4 text-brand-500"></i> Android 7.0+ (Tested up to Android 14)
+            </span>
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="file-archive" class="w-4 h-4 text-brand-500"></i> Ukuran: ~58.5 MB
+            </span>
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i> Bebas Iklan & Tanpa Pelacakan
+            </span>
+          </div>
+        </div>
+
+        <!-- Hero 3D Interactive Phone Mockup Showcase -->
+        <div class="lg:col-span-5 flex justify-center relative items-center" id="hero-3d-wrapper">
+          <div class="relative w-full max-w-[340px] sm:max-w-[420px] perspective-[1000px]">
+            
+            <!-- Glow background -->
+            <div class="absolute -inset-4 bg-gradient-to-r from-brand-600 via-indigo-600 to-purple-600 rounded-[54px] opacity-30 blur-2xl -z-10 animate-pulse-glow"></div>
+            
+            <!-- Main Interactive Phone -->
+            <div id="hero-phone-card" class="relative z-20 max-w-[280px] sm:max-w-[310px] mx-auto animate-float-slow transition-transform duration-150">
+              
+              <!-- Mini Screen Switcher Toolbar on Top of Phone -->
+              <div class="mb-3 flex items-center justify-center gap-1.5 bg-slate-900/80 backdrop-blur-md p-1.5 rounded-2xl border border-slate-700/80 shadow-lg max-w-[260px] mx-auto">
+                <button onclick="setHeroPhoneMode('home')" id="btn-hero-mode-home" class="px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all bg-brand-600 text-white shadow-sm flex items-center gap-1">
+                  <i data-lucide="sun" class="w-3 h-3"></i> Terang
+                </button>
+                <button onclick="setHeroPhoneMode('dark')" id="btn-hero-mode-dark" class="px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all text-slate-300 hover:text-white flex items-center gap-1">
+                  <i data-lucide="moon" class="w-3 h-3"></i> Gelap
+                </button>
+                <button onclick="setHeroPhoneMode('add')" id="btn-hero-mode-add" class="px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all text-slate-300 hover:text-white flex items-center gap-1">
+                  <i data-lucide="plus" class="w-3 h-3"></i> Form
+                </button>
+              </div>
+
+              <!-- Phone Mockup Body Frame -->
+              <div class="bg-slate-900 rounded-[44px] p-3 phone-mockup-frame border-4 border-slate-700/60 overflow-hidden shadow-2xl cursor-pointer" onclick="cycleHeroPhoneMode()" title="Klik untuk mengganti tampilan layar!">
+                <div class="relative rounded-[34px] overflow-hidden bg-slate-900">
+                  <!-- Notch bar -->
+                  <div class="absolute top-2 left-1/2 -translate-x-1/2 w-24 h-4 bg-slate-900 rounded-full z-30 flex items-center justify-center">
+                    <div class="w-3 h-3 rounded-full bg-slate-800 border border-slate-700"></div>
+                  </div>
+                  <!-- Main Screenshot with Smooth Transition -->
+                  <img id="hero-screen-img" src="assets/screenshot_home.png" alt="Layar Utama Aplikasi Pengingat Tugas" class="w-full h-auto object-cover block select-none transition-opacity duration-200" />
+                </div>
+              </div>
+
+              <!-- Floating Interactive Alarm Notification Card with Live Sound & Equalizer -->
+              <div id="hero-alarm-widget" onclick="triggerHeroAlarmSound()" class="absolute -bottom-6 -left-8 glass-card p-3.5 rounded-2xl shadow-xl border border-white/60 dark:border-slate-700/60 flex items-center gap-3 z-30 cursor-pointer hover:scale-105 transition-all group" title="Klik untuk tes suara alarm!">
+                <div id="hero-alarm-icon-box" class="w-11 h-11 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center shadow-md shadow-amber-500/30 group-hover:scale-110 transition-transform">
+                  <i data-lucide="alarm-clock" id="hero-alarm-icon" class="w-6 h-6 animate-pulse"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <p id="hero-alarm-title" class="text-xs font-bold text-slate-900 dark:text-white">Alarm Berdering!</p>
+                    <!-- Animated Wave Equalizer -->
+                    <div id="hero-sound-waves" class="hidden flex items-end gap-0.5 text-amber-500 h-4">
+                      <div class="wave-bar"></div>
+                      <div class="wave-bar"></div>
+                      <div class="wave-bar"></div>
+                      <div class="wave-bar"></div>
+                    </div>
+                  </div>
+                  <p id="hero-alarm-sub" class="text-[11px] text-slate-500">08:30 • Presentasi Proyek</p>
+                </div>
+              </div>
+
+              <!-- Floating Biometric Badge -->
+              <div class="absolute -top-4 -right-6 glass-card p-3.5 rounded-2xl shadow-xl border border-white/60 dark:border-slate-700/60 flex items-center gap-3 z-30 select-none animate-float-fast">
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center shadow-md shadow-emerald-500/30">
+                  <i data-lucide="fingerprint" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <p class="text-xs font-bold text-slate-900 dark:text-white">Biometrik Aktif</p>
+                  <p class="text-[11px] text-slate-500">Login instan 1-detik</p>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Secondary Phone Preview (Dark Mode - Floating Behind) -->
+            <div onclick="setHeroPhoneMode('dark')" class="absolute -right-8 top-12 z-10 hidden sm:block w-[240px] opacity-75 blur-[0.5px] hover:opacity-100 hover:blur-none transition-all duration-300 animate-float-fast cursor-pointer" title="Klik untuk melihat mode gelap!">
+              <div class="bg-slate-950 rounded-[38px] p-2.5 border-4 border-slate-800 shadow-2xl overflow-hidden hover:scale-105 transition-transform">
+                <div class="rounded-[28px] overflow-hidden">
+                  <img src="assets/screenshot_home_dark.png" alt="Mode Gelap" class="w-full h-auto block" />
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Highlights Counter Bar -->
+  <section class="border-y border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div class="space-y-1 hover:scale-105 transition-transform">
+          <p class="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-brand-600 to-indigo-600 bg-clip-text text-transparent">100%</p>
+          <p class="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400">Offline & Privasi Terjaga</p>
+        </div>
+        <div class="space-y-1 hover:scale-105 transition-transform">
+          <p class="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">8 Lapis</p>
+          <p class="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400">Fallback Sistem Alarm</p>
+        </div>
+        <div class="space-y-1 hover:scale-105 transition-transform">
+          <p class="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">0 Iklan</p>
+          <p class="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400">Fokus Tanpa Distraksi</p>
+        </div>
+        <div class="space-y-1 hover:scale-105 transition-transform">
+          <p class="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">SHA-256</p>
+          <p class="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400">Enkripsi Akun Lokal</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sinopsis Section -->
+  <section id="sinopsis" class="py-20 lg:py-28 relative">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center space-y-3 mb-12">
+        <div class="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/60 px-3.5 py-1.5 rounded-full border border-brand-200/50 dark:border-brand-800/50">
+          <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+          Sinopsis & Latar Belakang
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">
+          Mengapa Aplikasi Ini Dibuat?
+        </h2>
+        <p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
+          Sebuah solusi terpadu atas masalah penundaan tugas, alarm yang sering mati di HP Android modern, dan aplikasi to-do list yang rumit.
+        </p>
+      </div>
+
+      <!-- Synopsis Content Card -->
+      <div class="glass-card rounded-3xl p-8 sm:p-12 shadow-xl relative overflow-hidden border border-slate-200/80 dark:border-slate-800">
+        <!-- Watermark background icon -->
+        <div class="absolute -right-10 -bottom-10 text-brand-500/5 dark:text-brand-400/5 pointer-events-none">
+          <i data-lucide="check-check" class="w-80 h-80"></i>
+        </div>
+
+        <div class="space-y-6 text-slate-700 dark:text-slate-300 leading-relaxed text-base sm:text-lg relative z-10">
+          <p>
+            Di tengah padatnya dinamika perkuliahan, sekolah, dan rutinitas kerja sehari-hari, tantangan terbesar seseorang bukanlah keterbatasan waktu, melainkan <strong>terlewatnya batas waktu (deadline)</strong> serta <strong>sulitnya membedakan prioritas tugas yang mendesak</strong>. Sebagian besar aplikasi pengingat di pasaran menuntut koneksi internet aktif, memuat iklan banner yang mengganggu fokus, atau bahkan sering gagal membunyikan alarm akibat pembersihan proses latar belakang (background app killer) pada sistem operasi Android masa kini (Android 13 & 14+).
+          </p>
+
+          <p>
+            <strong>Pengingat Tugas</strong> dirancang khusus untuk memecahkan persoalan tersebut secara tuntas. Dibangun dengan framework berkinerja tinggi <strong>Flutter</strong> dan didukung basis data lokal <strong>Hive</strong>, aplikasi ini menggabungkan kemudahan pencatatan aktivitas dengan <strong>Smart Alarm Engine</strong> yang memiliki 8 lapis mekanisme cadangan (*fallback*). Hal ini menjamin nada pengingat akan selalu berbunyi tepat waktu saat deadline tiba.
+          </p>
+
+          <p>
+            Lebih dari sekadar aplikasi to-do list biasa, pengguna dapat mengamankan data pribadi dengan <strong>Sensor Sidik Jari (Biometrik)</strong>, mempersonalisasi nada alarm dengan <strong>file audio / musik MP3 favorit</strong> dari memori HP, memantau sebaran aktivitas lewat <strong>Kalender Interaktif</strong>, serta menikmati kenyamanan visual penuh dengan <strong>Material 3 & Dark Mode</strong>.
+          </p>
+
+          <!-- Key Goal Card Box -->
+          <div class="p-6 rounded-2xl bg-gradient-to-r from-brand-50 to-indigo-50 dark:from-slate-900 dark:to-brand-950/70 border border-brand-200 dark:border-brand-900/60 mt-6 flex items-start gap-4">
+            <div class="p-3 rounded-xl bg-brand-600 text-white shrink-0 shadow-md shadow-brand-600/30">
+              <i data-lucide="target" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">Visi & Tujuan Utama</h4>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
+                Menyediakan asisten manajemen tugas yang tangguh, andal, tanpa iklan, dan 100% menjaga privasi pengguna agar setiap target harian dapat terselesaikan tepat waktu tanpa stres.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Interactive Screen Showcase Gallery Section -->
+  <section id="preview" class="py-20 lg:py-28 bg-slate-100/70 dark:bg-slate-900/40 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center space-y-3 mb-12">
+        <div class="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/60 px-3.5 py-1.5 rounded-full border border-brand-200/50 dark:border-brand-800/50">
+          <i data-lucide="layout" class="w-3.5 h-3.5"></i>
+          Galeri Tangkapan Layar
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">
+          Eksplorasi Antarmuka Aplikasi
+        </h2>
+        <p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
+          Klik tab di bawah untuk melihat tangkapan layar nyata dari fitur-fitur utama Pengingat Tugas.
+        </p>
+      </div>
+
+      <!-- Interactive Tab Selector Buttons -->
+      <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-12 max-w-4xl mx-auto">
+        <button onclick="switchScreen('home')" id="tab-home" class="screen-tab tab-active px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2">
+          <i data-lucide="home" class="w-4 h-4"></i> Beranda
+        </button>
+        <button onclick="switchScreen('dark')" id="tab-dark" class="screen-tab bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-slate-200 dark:border-slate-700">
+          <i data-lucide="moon" class="w-4 h-4 text-purple-500"></i> Mode Gelap
+        </button>
+        <button onclick="switchScreen('add')" id="tab-add" class="screen-tab bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-slate-200 dark:border-slate-700">
+          <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-500"></i> Tambah Tugas & Nada
+        </button>
+        <button onclick="switchScreen('calendar')" id="tab-calendar" class="screen-tab bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-slate-200 dark:border-slate-700">
+          <i data-lucide="calendar" class="w-4 h-4 text-blue-500"></i> Kalender
+        </button>
+        <button onclick="switchScreen('settings')" id="tab-settings" class="screen-tab bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-slate-200 dark:border-slate-700">
+          <i data-lucide="settings" class="w-4 h-4 text-amber-500"></i> Pengaturan & Izin
+        </button>
+        <button onclick="switchScreen('login')" id="tab-login" class="screen-tab bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-slate-200 dark:border-slate-700">
+          <i data-lucide="lock" class="w-4 h-4 text-rose-500"></i> Login & Keamanan
+        </button>
+      </div>
+
+      <!-- Screen Preview Display Showcase -->
+      <div class="glass-card rounded-3xl p-6 sm:p-10 max-w-4xl mx-auto shadow-2xl border border-slate-200 dark:border-slate-800">
+        <div class="grid md:grid-cols-12 gap-8 items-center">
+          
+          <!-- Mockup Image Center -->
+          <div class="md:col-span-5 flex justify-center">
+            <div class="bg-slate-950 rounded-[38px] p-2.5 phone-mockup-frame max-w-[270px] border-4 border-slate-800 transition-all duration-300">
+              <div class="rounded-[28px] overflow-hidden bg-slate-900">
+                <img id="preview-image" src="assets/screenshot_home.png" alt="Tampilan Layar" class="w-full h-auto block transition-all duration-300" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Screen Feature Description -->
+          <div class="md:col-span-7 space-y-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-brand-50 dark:bg-brand-950 text-brand-600 dark:text-brand-300 text-xs font-bold">
+              <i data-lucide="info" class="w-3.5 h-3.5"></i>
+              <span id="preview-tag">Fitur Layar Utama</span>
+            </div>
+
+            <h3 id="preview-title" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+              Daftar Tugas Cerdas Berdasarkan Waktu
+            </h3>
+
+            <p id="preview-desc" class="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
+              Secara otomatis mengelompokkan tugas Anda ke dalam seksi <strong>Terlewat</strong>, <strong>Hari Ini</strong>, <strong>Mendatang</strong>, dan <strong>Selesai</strong>. Dilengkapi badge counter tugas yang memotivasi Anda menyelesaikan pekerjaan.
+            </p>
+
+            <div id="preview-points" class="space-y-2.5 pt-2 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+              <div class="flex items-center gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                <span>Coret tugas dengan satu ketukan checkbox</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                <span>Swipe ke kiri untuk menghapus tugas secara instan</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                <span>Toggle alarm langsung dari kartu tugas tanpa membuka menu edit</span>
+              </div>
+            </div>
+
+            <div class="pt-4">
+              <a href="#download" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs sm:text-sm shadow-md transition-all">
+                <i data-lucide="download" class="w-4 h-4"></i>
+                <span>Coba Sekarang</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Quick Gallery Thumbnails Strip -->
+      <div class="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-4 mt-8 max-w-4xl mx-auto">
+        <div onclick="switchScreen('home')" class="cursor-pointer rounded-2xl overflow-hidden border-2 border-brand-500 shadow-md hover:scale-105 transition-transform">
+          <img src="assets/screenshot_home.png" alt="Home" class="w-full h-24 object-cover" />
+        </div>
+        <div onclick="switchScreen('dark')" class="cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-300 dark:border-slate-700 shadow-md hover:scale-105 transition-transform">
+          <img src="assets/screenshot_home_dark.png" alt="Dark" class="w-full h-24 object-cover" />
+        </div>
+        <div onclick="switchScreen('add')" class="cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-300 dark:border-slate-700 shadow-md hover:scale-105 transition-transform">
+          <img src="assets/screenshot_add.png" alt="Add" class="w-full h-24 object-cover" />
+        </div>
+        <div onclick="switchScreen('calendar')" class="cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-300 dark:border-slate-700 shadow-md hover:scale-105 transition-transform">
+          <img src="assets/screenshot_calendar.png" alt="Calendar" class="w-full h-24 object-cover" />
+        </div>
+        <div onclick="switchScreen('settings')" class="cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-300 dark:border-slate-700 shadow-md hover:scale-105 transition-transform">
+          <img src="assets/screenshot_settings.png" alt="Settings" class="w-full h-24 object-cover" />
+        </div>
+        <div onclick="switchScreen('login')" class="cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-300 dark:border-slate-700 shadow-md hover:scale-105 transition-transform">
+          <img src="assets/screenshot_login.png" alt="Login" class="w-full h-24 object-cover" />
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Fitur Unggulan Detail Section -->
+  <section id="fitur" class="py-20 lg:py-28 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center space-y-3 mb-16">
+        <div class="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/60 px-3.5 py-1.5 rounded-full border border-brand-200/50 dark:border-brand-800/50">
+          <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+          Fitur Unggulan
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">
+          Dibuat Khusus untuk Kebutuhan Produktivitas Nyata
+        </h2>
+        <p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
+          Setiap modul dikembangkan dengan standar teknis tinggi untuk memastikan keandalan mutlak.
+        </p>
+      </div>
+
+      <!-- Feature Grid -->
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        
+        <!-- Card 1 -->
+        <div class="glass-card rounded-3xl p-8 hover:-translate-y-2 transition-all duration-300 shadow-md hover:shadow-2xl border border-slate-200/80 dark:border-slate-800 group">
+          <div class="w-14 h-14 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-md shadow-amber-500/10">
+            <i data-lucide="alarm-clock" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Smart Alarm Engine</h3>
+          <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+            Dilengkapi <strong>8 level fallback berjenjang</strong> dengan dukungan <em>Full Screen Intent</em> & <em>Exact Alarm</em> agar nada alarm tetap berdering saat HP terkunci atau mode Doze aktif.
+          </p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="glass-card rounded-3xl p-8 hover:-translate-y-2 transition-all duration-300 shadow-md hover:shadow-2xl border border-slate-200/80 dark:border-slate-800 group">
+          <div class="w-14 h-14 rounded-2xl bg-purple-500/15 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-md shadow-purple-500/10">
+            <i data-lucide="music" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Nada Dering MP3 Kustom</h3>
+          <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+            Pilih lagu MP3 favorit langsung dari memori HP untuk setiap tugas. Dilengkapi fitur <strong>Cek Suara (Preview)</strong> instan sebelum tugas disimpan.
+          </p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="glass-card rounded-3xl p-8 hover:-translate-y-2 transition-all duration-300 shadow-md hover:shadow-2xl border border-slate-200/80 dark:border-slate-800 group">
+          <div class="w-14 h-14 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-md shadow-emerald-500/10">
+            <i data-lucide="fingerprint" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Biometrik & Enkripsi Akun</h3>
+          <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+            Login instan dengan sensor sidik jari atau Face ID. Setiap akun memiliki database tugas terisolasi yang dienkripsi dengan standar <strong>SHA-256</strong>.
+          </p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="glass-card rounded-3xl p-8 hover:-translate-y-2 transition-all duration-300 shadow-md hover:shadow-2xl border border-slate-200/80 dark:border-slate-800 group">
+          <div class="w-14 h-14 rounded-2xl bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-md shadow-blue-500/10">
+            <i data-lucide="calendar-days" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Kalender Visual Interaktif</h3>
+          <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+            Tinjau seluruh jadwal dalam format kalender bulanan lengkap dengan indikator titik penanda tugas berbahasa Indonesia.
+          </p>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="glass-card rounded-3xl p-8 hover:-translate-y-2 transition-all duration-300 shadow-md hover:shadow-2xl border border-slate-200/80 dark:border-slate-800 group">
+          <div class="w-14 h-14 rounded-2xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-md shadow-indigo-500/10">
+            <i data-lucide="tags" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Kategori & Prioritas Berwarna</h3>
+          <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+            Kategorikan tugas (Sekolah, Pekerjaan, Pribadi, dll) dan beri warna badge urgensi (Tinggi, Sedang, Rendah) untuk manajemen visual yang rapi.
+          </p>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="glass-card rounded-3xl p-8 hover:-translate-y-2 transition-all duration-300 shadow-md hover:shadow-2xl border border-slate-200/80 dark:border-slate-800 group">
+          <div class="w-14 h-14 rounded-2xl bg-rose-500/15 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-md shadow-rose-500/10">
+            <i data-lucide="moon" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Material 3 & Dark Mode</h3>
+          <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+            Desain visual antarmuka modern yang memanjakan mata, ramah di malam hari, dan menghemat konsumsi baterai perangkat.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Comparison Table Section -->
+  <section id="perbandingan" class="py-20 lg:py-28 bg-slate-100/70 dark:bg-slate-900/40 relative">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center space-y-3 mb-16">
+        <div class="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/60 px-3.5 py-1.5 rounded-full border border-brand-200/50 dark:border-brand-800/50">
+          <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+          Perbandingan Keunggulan
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">
+          Mengapa Memilih Pengingat Tugas?
+        </h2>
+        <p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
+          Lihat perbedaan signifikan aplikasi ini dibandingkan solusi konvensional lainnya.
+        </p>
+      </div>
+
+      <!-- Comparison Card Table -->
+      <div class="glass-card rounded-3xl overflow-hidden shadow-xl border border-slate-200 dark:border-slate-800">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-100 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
+              <tr>
+                <th class="p-4 sm:p-5 font-bold text-slate-700 dark:text-slate-300">Fitur & Parameter</th>
+                <th class="p-4 sm:p-5 font-bold text-brand-600 dark:text-brand-400 bg-brand-50/50 dark:bg-brand-950/40">Pengingat Tugas</th>
+                <th class="p-4 sm:p-5 font-bold text-slate-500 dark:text-slate-400">Alarm Bawaan HP</th>
+                <th class="p-4 sm:p-5 font-bold text-slate-500 dark:text-slate-400">Aplikasi To-Do Online</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+              <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/40">
+                <td class="p-4 sm:p-5 font-semibold text-slate-800 dark:text-slate-200">Keandalan Alarm saat HP Sleep</td>
+                <td class="p-4 sm:p-5 bg-brand-50/30 dark:bg-brand-950/20 font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                  <i data-lucide="check" class="w-4 h-4"></i> 8-Layer Fallback
+                </td>
+                <td class="p-4 sm:p-5 text-slate-500">Biasa saja</td>
+                <td class="p-4 sm:p-5 text-red-500">Sering tidak bunyi</td>
+              </tr>
+              <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/40">
+                <td class="p-4 sm:p-5 font-semibold text-slate-800 dark:text-slate-200">Nada Dering Lagu MP3 Kustom</td>
+                <td class="p-4 sm:p-5 bg-brand-50/30 dark:bg-brand-950/20 font-bold text-emerald-600 dark:text-emerald-400">
+                  <span class="inline-flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Ya, Bebas Pilih</span>
+                </td>
+                <td class="p-4 sm:p-5 text-slate-500">Terbatas bawaan sistem</td>
+                <td class="p-4 sm:p-5 text-red-500">Tidak tersedia</td>
+              </tr>
+              <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/40">
+                <td class="p-4 sm:p-5 font-semibold text-slate-800 dark:text-slate-200">Ketergantungan Internet (Offline)</td>
+                <td class="p-4 sm:p-5 bg-brand-50/30 dark:bg-brand-950/20 font-bold text-emerald-600 dark:text-emerald-400">
+                  <span class="inline-flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> 100% Offline & Cepat</span>
+                </td>
+                <td class="p-4 sm:p-5 text-slate-500">Offline</td>
+                <td class="p-4 sm:p-5 text-red-500">Wajib online / kuota</td>
+              </tr>
+              <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/40">
+                <td class="p-4 sm:p-5 font-semibold text-slate-800 dark:text-slate-200">Iklan & Biaya Langganan</td>
+                <td class="p-4 sm:p-5 bg-brand-50/30 dark:bg-brand-950/20 font-bold text-emerald-600 dark:text-emerald-400">
+                  <span class="inline-flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Gratis & 0 Iklan</span>
+                </td>
+                <td class="p-4 sm:p-5 text-slate-500">Gratis</td>
+                <td class="p-4 sm:p-5 text-red-500">Banyak iklan / berbayar</td>
+              </tr>
+              <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/40">
+                <td class="p-4 sm:p-5 font-semibold text-slate-800 dark:text-slate-200">Autentikasi Akun & Sidik Jari</td>
+                <td class="p-4 sm:p-5 bg-brand-50/30 dark:bg-brand-950/20 font-bold text-emerald-600 dark:text-emerald-400">
+                  <span class="inline-flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> SHA-256 + Biometrik</span>
+                </td>
+                <td class="p-4 sm:p-5 text-slate-500">Tidak ada akun</td>
+                <td class="p-4 sm:p-5 text-slate-500">Login email biasa</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Panduan Pemasangan Section -->
+  <section id="panduan" class="py-20 lg:py-28 relative">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center space-y-3 mb-16">
+        <div class="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/60 px-3.5 py-1.5 rounded-full border border-brand-200/50 dark:border-brand-800/50">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+          Langkah Mudah
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">
+          Cara Memasang APK di Smartphone Anda
+        </h2>
+        <p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
+          Cukup 4 langkah cepat dan aplikasi langsung siap digunakan.
+        </p>
+      </div>
+
+      <!-- Installation Steps -->
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- Step 1 -->
+        <div class="glass-card rounded-3xl p-6 relative space-y-3 border border-slate-200 dark:border-slate-800 hover:-translate-y-1 transition-all">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 text-white font-bold flex items-center justify-center text-lg shadow-md shadow-brand-500/30">
+            1
+          </div>
+          <h4 class="font-bold text-slate-900 dark:text-white text-base">Unduh APK</h4>
+          <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            Klik tombol <strong>"Unduh APK"</strong> di website ini dan tunggu hingga proses unduhan selesai.
+          </p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="glass-card rounded-3xl p-6 relative space-y-3 border border-slate-200 dark:border-slate-800 hover:-translate-y-1 transition-all">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 text-white font-bold flex items-center justify-center text-lg shadow-md shadow-brand-500/30">
+            2
+          </div>
+          <h4 class="font-bold text-slate-900 dark:text-white text-base">Buka File APK</h4>
+          <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            Buka folder <em>Download</em> di pengelola file HP Anda dan ketuk file <code>pengingat-tugas.apk</code>.
+          </p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="glass-card rounded-3xl p-6 relative space-y-3 border border-slate-200 dark:border-slate-800 hover:-translate-y-1 transition-all">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 text-white font-bold flex items-center justify-center text-lg shadow-md shadow-brand-500/30">
+            3
+          </div>
+          <h4 class="font-bold text-slate-900 dark:text-white text-base">Izinkan Sumber</h4>
+          <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            Jika muncul peringatan browser, aktifkan <em>"Izinkan pemasangan dari sumber ini"</em> (Allow Unknown Apps).
+          </p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="glass-card rounded-3xl p-6 relative space-y-3 border border-slate-200 dark:border-slate-800 hover:-translate-y-1 transition-all">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 text-white font-bold flex items-center justify-center text-lg shadow-md shadow-brand-500/30">
+            4
+          </div>
+          <h4 class="font-bold text-slate-900 dark:text-white text-base">Siap Digunakan</h4>
+          <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            Buka aplikasi, daftarkan akun lokal Anda, dan mulai kelola seluruh aktivitas penting harian Anda!
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Download CTA Banner Section -->
+  <section class="py-16 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="rounded-3xl bg-gradient-to-r from-brand-700 via-indigo-700 to-purple-800 text-white p-8 sm:p-14 shadow-2xl relative overflow-hidden text-center space-y-6">
+        
+        <!-- Decorative Glow -->
+        <div class="absolute -top-24 -right-24 w-80 h-80 bg-white/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-80 h-80 bg-brand-400/25 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 max-w-3xl mx-auto space-y-4">
+          <div class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center mx-auto mb-2 border border-white/20 p-2.5">
+            <img src="assets/icon.png" alt="App Icon" class="w-full h-full object-contain rounded-xl" />
+          </div>
+
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight">
+            Mulai Hidup Lebih Teratur & Produktif!
+          </h2>
+          <p class="text-brand-100 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
+            Unduh aplikasinya sekarang secara gratis, aman, dan rasakan kepastian alarm tepat waktu untuk semua tugas Anda.
+          </p>
+
+          <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="pengingat-tugas.apk" download="pengingat-tugas.apk" class="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-white text-brand-700 hover:bg-brand-50 font-bold text-base shadow-xl hover:shadow-2xl hover:scale-105 transition-all">
+              <i data-lucide="download" class="w-5 h-5"></i>
+              <span>Unduh APK Sekarang (58.5 MB)</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-200 dark:border-slate-800 py-10 text-center text-xs text-slate-500 dark:text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
+      <div class="flex items-center justify-center gap-2">
+        <div class="w-6 h-6 rounded-lg bg-brand-600 flex items-center justify-center text-white text-xs">
+          <i data-lucide="check" class="w-3.5 h-3.5"></i>
+        </div>
+        <span class="font-bold text-slate-700 dark:text-slate-300 text-sm">Pengingat Tugas</span>
+        <span class="text-slate-400">• Versi 1.0.0</span>
+      </div>
+      <p>Dikembangkan oleh <span class="font-semibold text-brand-600 dark:text-brand-400">Fadhil</span> • Dibuat dengan Flutter & Hive</p>
+      <p>© 2026 Pengingat Tugas. Hak cipta dilindungi undang-undang.</p>
+    </div>
+  </footer>
+
+  <!-- Interactive Scripts Engine -->
+  <script>
+    // 1. Initialize Lucide icons
+    lucide.createIcons();
+
+    // 2. Dark Mode Toggle
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = 'light';
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = 'dark';
+      }
+    });
+
+    // 3. Dynamic Rotating Text in Hero
+    const rotatingWords = [
+      "Tugas & Deadline",
+      "Jadwal Kuliah & Sekolah",
+      "Rapat & Pekerjaan",
+      "Rutinitas & Prioritas",
+      "Agenda Harian Anda"
+    ];
+    let rotatingIdx = 0;
+    const rotatingElem = document.getElementById('rotating-text');
+    setInterval(() => {
+      rotatingIdx = (rotatingIdx + 1) % rotatingWords.length;
+      rotatingElem.style.opacity = '0';
+      setTimeout(() => {
+        rotatingElem.textContent = rotatingWords[rotatingIdx];
+        rotatingElem.style.opacity = '1';
+      }, 200);
+    }, 3200);
+
+    // 4. Ambient Cursor Glow Follower in Hero
+    const heroSection = document.getElementById('hero-section');
+    const cursorGlow = document.getElementById('cursor-glow');
+    heroSection.addEventListener('mousemove', (e) => {
+      const rect = heroSection.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      cursorGlow.style.left = `${x}px`;
+      cursorGlow.style.top = `${y}px`;
+      cursorGlow.style.opacity = '1';
+    });
+    heroSection.addEventListener('mouseleave', () => {
+      cursorGlow.style.opacity = '0';
+    });
+
+    // 5. 3D Perspective Tilt on Mouse Movement over Hero Mockup
+    const heroWrapper = document.getElementById('hero-3d-wrapper');
+    const heroPhoneCard = document.getElementById('hero-phone-card');
+    heroWrapper.addEventListener('mousemove', (e) => {
+      const rect = heroWrapper.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      const rotateX = -(y / rect.height) * 16;
+      const rotateY = (x / rect.width) * 16;
+      heroPhoneCard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+    heroWrapper.addEventListener('mouseleave', () => {
+      heroPhoneCard.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+    });
+
+    // 6. Interactive Hero Phone Mockup Mode Switcher
+    const heroModes = {
+      home: { img: 'assets/screenshot_home.png', btn: 'btn-hero-mode-home' },
+      dark: { img: 'assets/screenshot_home_dark.png', btn: 'btn-hero-mode-dark' },
+      add: { img: 'assets/screenshot_add.png', btn: 'btn-hero-mode-add' }
+    };
+    let currentHeroMode = 'home';
+
+    function setHeroPhoneMode(mode) {
+      currentHeroMode = mode;
+      const img = document.getElementById('hero-screen-img');
+      img.style.opacity = '0.3';
+      setTimeout(() => {
+        img.src = heroModes[mode].img;
+        img.style.opacity = '1';
+      }, 150);
+
+      // Update switcher button styles
+      ['home', 'dark', 'add'].forEach(m => {
+        const btn = document.getElementById(heroModes[m].btn);
+        if (m === mode) {
+          btn.className = "px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all bg-brand-600 text-white shadow-sm flex items-center gap-1";
+        } else {
+          btn.className = "px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all text-slate-300 hover:text-white flex items-center gap-1";
+        }
+      });
+    }
+
+    function cycleHeroPhoneMode() {
+      const order = ['home', 'dark', 'add'];
+      const next = order[(order.indexOf(currentHeroMode) + 1) % order.length];
+      setHeroPhoneMode(next);
+    }
+
+    // 7. Interactive Audio Simulator via Web Audio API
+    let audioCtx = null;
+    let alarmPlaying = false;
+    let alarmTimer = null;
+
+    function triggerHeroAlarmSound() {
+      if (alarmPlaying) {
+        stopHeroAlarm();
+        return;
+      }
+
+      alarmPlaying = true;
+      const soundBtnText = document.getElementById('hero-sound-btn-text');
+      const soundWaves = document.getElementById('hero-sound-waves');
+      const alarmTitle = document.getElementById('hero-alarm-title');
+      const alarmIconBox = document.getElementById('hero-alarm-icon-box');
+
+      if (soundBtnText) soundBtnText.textContent = 'Matikan Suara (Berdering)';
+      if (soundWaves) soundWaves.classList.remove('hidden');
+      if (alarmTitle) alarmTitle.textContent = '🔊 Alarm Berbunyi!';
+      if (alarmIconBox) alarmIconBox.classList.add('animate-bounce');
+
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!audioCtx) audioCtx = new AudioContext();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        // Melodic alarm chime sequence (Chime notes: E5 -> G#5 -> B5 -> E6)
+        const notes = [659.25, 830.61, 987.77, 1318.51, 987.77, 1318.51];
+        let noteIndex = 0;
+
+        function playChimeNote() {
+          if (!alarmPlaying || !audioCtx) return;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(notes[noteIndex % notes.length], audioCtx.currentTime);
+
+          gain.gain.setValueAtTime(0, audioCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.18, audioCtx.currentTime + 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.36);
+
+          noteIndex++;
+          alarmTimer = setTimeout(playChimeNote, 280);
+        }
+
+        playChimeNote();
+
+        // Auto stop after 7 seconds
+        setTimeout(() => {
+          if (alarmPlaying) stopHeroAlarm();
+        }, 7000);
+
+      } catch (e) {
+        console.warn('Web Audio error:', e);
+      }
+    }
+
+    function stopHeroAlarm() {
+      alarmPlaying = false;
+      if (alarmTimer) clearTimeout(alarmTimer);
+      
+      const soundBtnText = document.getElementById('hero-sound-btn-text');
+      const soundWaves = document.getElementById('hero-sound-waves');
+      const alarmTitle = document.getElementById('hero-alarm-title');
+      const alarmIconBox = document.getElementById('hero-alarm-icon-box');
+
+      if (soundBtnText) soundBtnText.textContent = 'Tes Bunyi Alarm';
+      if (soundWaves) soundWaves.classList.add('hidden');
+      if (alarmTitle) alarmTitle.textContent = 'Alarm Berdering!';
+      if (alarmIconBox) alarmIconBox.classList.remove('animate-bounce');
+    }
+
+    // 8. Interactive Checklist with Confetti Effect
+    function toggleHeroCheck(cb) {
+      const span = cb.nextElementSibling;
+      const badge = cb.parentElement.querySelector('span:last-child');
+      if (cb.checked) {
+        span.classList.add('line-through', 'text-slate-400');
+        span.classList.remove('text-slate-700', 'dark:text-slate-200');
+        badge.textContent = 'Selesai';
+        badge.className = 'ml-auto text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 font-bold';
+
+        // Trigger celebratory confetti!
+        if (typeof confetti === 'function') {
+          confetti({
+            particleCount: 40,
+            spread: 60,
+            origin: { y: 0.7 }
+          });
+        }
+      } else {
+        span.classList.remove('line-through', 'text-slate-400');
+        span.classList.add('text-slate-700', 'dark:text-slate-200');
+        badge.textContent = 'Belum Selesai';
+        badge.className = 'ml-auto text-[10px] px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 font-bold';
+      }
+    }
+
+    // 9. Screen Showcase Gallery Data & Switcher
+    const screenData = {
+      home: {
+        tag: 'Fitur Layar Utama',
+        title: 'Daftar Tugas Cerdas Berdasarkan Waktu',
+        desc: 'Secara otomatis mengelompokkan tugas Anda ke dalam seksi <strong>Terlewat</strong>, <strong>Hari Ini</strong>, <strong>Mendatang</strong>, dan <strong>Selesai</strong>. Dilengkapi badge counter tugas yang memotivasi Anda menyelesaikan pekerjaan.',
+        image: 'assets/screenshot_home.png',
+        points: [
+          'Coret tugas dengan satu ketukan checkbox',
+          'Swipe ke kiri untuk menghapus tugas secara instan',
+          'Toggle alarm langsung dari kartu tugas tanpa membuka menu edit'
+        ]
+      },
+      dark: {
+        tag: 'Kenyamanan Visual',
+        title: 'Mode Gelap (Dark Mode) yang Elegan',
+        desc: 'Memberikan pengalaman visual yang ramah di mata untuk penggunaan malam hari serta menghemat konsumsi daya baterai pada layar AMOLED/OLED.',
+        image: 'assets/screenshot_home_dark.png',
+        points: [
+          'Kontras warna tinggi yang mudah dibaca',
+          'Peralihan tema instan dari tab Pengaturan',
+          'Desain standar Material 3 Google terkini'
+        ]
+      },
+      add: {
+        tag: 'Formulir Interaktif',
+        title: 'Tambah Tugas dengan Nada MP3 Pilihan',
+        desc: 'Atur tanggal, jam, kategori, prioritas urgensi, hingga pengulangan jadwal (Harian, Mingguan, Bulanan) dengan pemilihan nada alarm custom dari memori HP.',
+        image: 'assets/screenshot_add.png',
+        points: [
+          'Pilih file musik / nada MP3 dari galeri HP',
+          'Tombol Cek Suara untuk preview sebelum disimpan',
+          'Sistem perizinan exact alarm otomatis'
+        ]
+      },
+      calendar: {
+        tag: 'Visual Timeline',
+        title: 'Kalender Interaktif Terintegrasi',
+        desc: 'Lihat agenda harian dan bulanan secara menyeluruh. Cukup ketuk tanggal tertentu pada kalender untuk melihat dan membuat tugas baru pada hari tersebut.',
+        image: 'assets/screenshot_calendar.png',
+        points: [
+          'Penanda titik visual pada tanggal yang memiliki tugas',
+          'Format tanggal bahasa Indonesia lengkap',
+          'Navigasi bulan dan minggu yang sangat responsif'
+        ]
+      },
+      settings: {
+        tag: 'Pusat Kontrol',
+        title: 'Pengaturan Izin & Statistik Produktivitas',
+        desc: 'Pantau status izin notifikasi, exact alarm, optimasi baterai, serta ringkasan total tugas selesai untuk melihat progres produktivitas Anda.',
+        image: 'assets/screenshot_settings.png',
+        points: [
+          'Deteksi status izin alarm secara real-time',
+          'Tombol uji coba nada alarm 5 detik',
+          'Tombol darurat batalkan semua alarm'
+        ]
+      },
+      login: {
+        tag: 'Keamanan Data',
+        title: 'Login Cepat dengan Sidik Jari & Enkripsi',
+        desc: 'Keamanan tingkat tinggi dengan isolasi database lokal per-pengguna dan enkripsi kata sandi SHA-256 serta verifikasi biometrik.',
+        image: 'assets/screenshot_login.png',
+        points: [
+          'Dukungan multi-user pada satu perangkat yang sama',
+          'Login 1-ketuk dengan sensor sidik jari / Face ID',
+          '100% offline tanpa pengiriman data ke server luar'
+        ]
+      }
+    };
+
+    function switchScreen(key) {
+      const data = screenData[key];
+      if (!data) return;
+
+      const img = document.getElementById('preview-image');
+      img.style.opacity = '0';
+      setTimeout(() => {
+        img.src = data.image;
+        img.style.opacity = '1';
+      }, 150);
+
+      document.getElementById('preview-tag').textContent = data.tag;
+      document.getElementById('preview-title').textContent = data.title;
+      document.getElementById('preview-desc').innerHTML = data.desc;
+
+      const pointsContainer = document.getElementById('preview-points');
+      pointsContainer.innerHTML = data.points.map(p => `
+        <div class="flex items-center gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+          <span>${p}</span>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+
+      document.querySelectorAll('.screen-tab').forEach(btn => {
+        btn.classList.remove('tab-active');
+        btn.classList.add('bg-white', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300');
+      });
+
+      const activeBtn = document.getElementById('tab-' + key);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-white', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300');
+        activeBtn.classList.add('tab-active');
+      }
+    }
+  </script>
+</body>
+</html>
